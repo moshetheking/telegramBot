@@ -74,11 +74,13 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
             handleJoinRequest(chatId, user);
         } else {
             sendMessage(chatId,
-                    EMOJI_WARNING + " לא הצלחתי להבין את ההודעה.\n\n" +
+                    EMOJI_WARNING + " <b>לא הצלחתי להבין את ההודעה.</b>\n\n" +
                     "כדי להצטרף לקהילה, שלח:\n" +
+                    "<blockquote>" +
                     EMOJI_POINT + " /start\n" +
                     EMOJI_POINT + " היי\n" +
-                    EMOJI_POINT + " Hi");
+                    EMOJI_POINT + " Hi\n" +
+                    "</blockquote>");
         }
     }
 
@@ -101,8 +103,10 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
 
         // הודעת ברוכים הבאים לחבר החדש
         sendMessage(chatId,
-                EMOJI_PARTY + " ברוכים הבאים לקהילה, " + newMember.getDisplayName() + "!\n\n" +
-                EMOJI_PEOPLE + " מספר חברי הקהילה: " + communityManager.getMemberCount() + "\n\n" +
+                EMOJI_PARTY + " <b>ברוכים הבאים לקהילה, " + newMember.getDisplayName() + "!</b>\n\n" +
+                "<blockquote>" +
+                EMOJI_PEOPLE + " מספר חברי הקהילה: <b>" + communityManager.getMemberCount() + "</b>\n" +
+                "</blockquote>\n" +
                 "תקבל/י הודעה כשיתחיל סקר חדש " + EMOJI_CLIPBOARD);
 
         // הודעה לכל שאר חברי הקהילה
@@ -110,9 +114,11 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
     }
 
     private void notifyCommunityAboutNewMember(CommunityMember newMember) {
-        String notification = EMOJI_WAVE + " חבר/ה חדש/ה הצטרף/ה לקהילה!\n\n" +
-                EMOJI_STAR + " שם: " + newMember.getDisplayName() + "\n" +
-                EMOJI_PEOPLE + " חברי הקהילה כעת: " + communityManager.getMemberCount();
+        String notification = EMOJI_WAVE + " <b>חבר/ה חדש/ה הצטרף/ה לקהילה!</b>\n\n" +
+                "<blockquote>" +
+                EMOJI_STAR + " שם: <b>" + newMember.getDisplayName() + "</b>\n" +
+                EMOJI_PEOPLE + " חברי הקהילה כעת: <b>" + communityManager.getMemberCount() + "</b>\n" +
+                "</blockquote>";
 
         for (CommunityMember member : communityManager.getMembers()) {
             if (member.getChatId() != newMember.getChatId()) {
@@ -192,10 +198,12 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
     public void sendSurveyToParticipant(long chatId, Survey survey) {
         // הודעת פתיחה
         sendMessage(chatId,
-                EMOJI_CLIPBOARD + " *סקר חדש!*\n\n" +
-                "מספר שאלות: " + survey.getQuestionCount() + "\n" +
-                "זמן מענה: " + "5 דקות\n\n" +
-                "ענה/י על השאלות הבאות:");
+                EMOJI_CLIPBOARD + " <b>סקר חדש!</b>\n\n" +
+                "<blockquote>" +
+                "מספר שאלות: <b>" + survey.getQuestionCount() + "</b>\n" +
+                "זמן מענה: <b>5 דקות</b>\n" +
+                "</blockquote>\n" +
+                "👇 ענה/י על השאלות הבאות:");
 
         // שליחת כל שאלה עם כפתורי תשובה
         for (SurveyQuestion question : survey.getQuestions()) {
@@ -204,8 +212,8 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
     }
 
     private void sendQuestionMessage(long chatId, SurveyQuestion question) {
-        String text = EMOJI_POINT + " *שאלה " + (question.getQuestionIndex() + 1) + ":*\n" +
-                question.getQuestionText();
+        String text = "<b>" + EMOJI_POINT + " שאלה " + (question.getQuestionIndex() + 1) + ":</b>\n" +
+                "<blockquote>" + question.getQuestionText() + "</blockquote>";
 
         // יצירת כפתורי תשובה
         List<InlineKeyboardRow> rows = new ArrayList<>();
@@ -226,7 +234,7 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
-                .parseMode("Markdown")
+                .parseMode("HTML")
                 .replyMarkup(markup)
                 .build();
 
@@ -246,18 +254,22 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
         }
 
         sendMessage(chatId,
-                EMOJI_BELL + " *תזכורת!*\n\n" +
+                EMOJI_BELL + " <b>תזכורת!</b>\n\n" +
+                "<blockquote>" +
                 "טרם סיימת לענות על הסקר.\n" +
-                "ענית על " + answered + " מתוך " + survey.getQuestionCount() + " שאלות.\n\n" +
+                "ענית על " + answered + " מתוך " + survey.getQuestionCount() + " שאלות.\n" +
+                "</blockquote>\n" +
                 "נותרו כ-2 דקות להשלמת המענה! " + EMOJI_WARNING);
     }
 
     @Override
     public void sendSurveyClosed(long chatId) {
         sendMessage(chatId,
-                EMOJI_LOCK + " *הסקר הסתיים!*\n\n" +
+                EMOJI_LOCK + " <b>הסקר הסתיים!</b>\n\n" +
+                "<blockquote>" +
                 "תודה לכל מי שהשתתף " + EMOJI_PARTY + "\n" +
-                "התוצאות יפורסמו בקרוב.");
+                "התוצאות זמינות במערכת הניהול." +
+                "</blockquote>");
     }
 
     // --- Utility Methods ---
@@ -266,7 +278,7 @@ public class SurveyBot implements LongPollingSingleThreadUpdateConsumer, SurveyM
         SendMessage message = SendMessage.builder()
                 .chatId(chatId)
                 .text(text)
-                .parseMode("Markdown")
+                .parseMode("HTML")
                 .build();
         try {
             telegramClient.execute(message);

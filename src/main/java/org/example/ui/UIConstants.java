@@ -39,22 +39,22 @@ public class UIConstants {
     public static final Color STATUS_IN_PROGRESS = ACCENT_ORANGE;
     public static final Color STATUS_NOT_STARTED = TEXT_MUTED;
 
-    // --- Fonts ---
-    public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 20);
-    public static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.BOLD, 16);
-    public static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 14);
-    public static final Font FONT_BODY_BOLD = new Font("Segoe UI", Font.BOLD, 14);
-    public static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 12);
-    public static final Font FONT_COUNTER = new Font("Segoe UI", Font.BOLD, 36);
-    public static final Font FONT_COUNTDOWN = new Font("Consolas", Font.BOLD, 28);
-    public static final Font FONT_TABLE = new Font("Segoe UI", Font.PLAIN, 13);
-    public static final Font FONT_TABLE_HEADER = new Font("Segoe UI", Font.BOLD, 13);
+    // --- Fonts (Increased for better readability) ---
+    public static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 24);
+    public static final Font FONT_SUBTITLE = new Font("Segoe UI", Font.BOLD, 18);
+    public static final Font FONT_BODY = new Font("Segoe UI", Font.PLAIN, 15);
+    public static final Font FONT_BODY_BOLD = new Font("Segoe UI", Font.BOLD, 15);
+    public static final Font FONT_SMALL = new Font("Segoe UI", Font.PLAIN, 13);
+    public static final Font FONT_COUNTER = new Font("Segoe UI", Font.BOLD, 42);
+    public static final Font FONT_COUNTDOWN = new Font("Consolas", Font.BOLD, 32);
+    public static final Font FONT_TABLE = new Font("Segoe UI", Font.PLAIN, 14);
+    public static final Font FONT_TABLE_HEADER = new Font("Segoe UI", Font.BOLD, 14);
 
     // --- Dimensions ---
-    public static final int PADDING = 16;
-    public static final int PADDING_SMALL = 8;
-    public static final int BORDER_RADIUS = 12;
-    public static final Dimension BUTTON_SIZE = new Dimension(160, 40);
+    public static final int PADDING = 20;
+    public static final int PADDING_SMALL = 10;
+    public static final int BORDER_RADIUS = 16;
+    public static final Dimension BUTTON_SIZE = new Dimension(170, 44);
 
     // --- Factory Methods ---
 
@@ -67,23 +67,9 @@ public class UIConstants {
         button.setForeground(Color.WHITE);
         button.setBackground(bgColor);
         button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setOpaque(true);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setPreferredSize(BUTTON_SIZE);
-
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            Color original = bgColor;
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent e) {
-                button.setBackground(original.brighter());
-            }
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent e) {
-                button.setBackground(original);
-            }
-        });
-
+        // FlatLaf handles hover, borders, and rounded corners automatically
         return button;
     }
 
@@ -190,8 +176,8 @@ public class UIConstants {
         JScrollPane scrollPane = new JScrollPane(view);
         scrollPane.setBackground(BG_PANEL);
         scrollPane.getViewport().setBackground(BG_PANEL);
-        scrollPane.setBorder(BorderFactory.createLineBorder(BORDER_COLOR));
-        scrollPane.getVerticalScrollBar().setUI(new ModernScrollBarUI());
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getVerticalScrollBar().setUnitIncrement(20); // Make scrolling fast
         return scrollPane;
     }
 
@@ -201,13 +187,8 @@ public class UIConstants {
     public static JTextField createStyledTextField(String placeholder) {
         JTextField field = new JTextField();
         field.setFont(FONT_BODY);
-        field.setForeground(TEXT_PRIMARY);
-        field.setBackground(BG_INPUT);
-        field.setCaretColor(TEXT_PRIMARY);
-        field.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR),
-                BorderFactory.createEmptyBorder(8, 12, 8, 12)
-        ));
+        field.setPreferredSize(new Dimension(200, 44));
+        field.putClientProperty("JTextField.placeholderText", placeholder);
         field.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
         return field;
     }
@@ -218,10 +199,6 @@ public class UIConstants {
     public static JTextArea createStyledTextArea(int rows, int cols) {
         JTextArea area = new JTextArea(rows, cols);
         area.setFont(FONT_BODY);
-        area.setForeground(TEXT_PRIMARY);
-        area.setBackground(BG_INPUT);
-        area.setCaretColor(TEXT_PRIMARY);
-        area.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         area.setLineWrap(true);
         area.setWrapStyleWord(true);
         area.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
@@ -231,43 +208,5 @@ public class UIConstants {
     /**
      * Scrollbar מודרני.
      */
-    static class ModernScrollBarUI extends javax.swing.plaf.basic.BasicScrollBarUI {
-        @Override
-        protected void configureScrollBarColors() {
-            this.thumbColor = new Color(80, 82, 100);
-            this.trackColor = BG_PANEL;
-        }
-
-        @Override
-        protected JButton createDecreaseButton(int orientation) {
-            return createZeroButton();
-        }
-
-        @Override
-        protected JButton createIncreaseButton(int orientation) {
-            return createZeroButton();
-        }
-
-        private JButton createZeroButton() {
-            JButton button = new JButton();
-            button.setPreferredSize(new Dimension(0, 0));
-            return button;
-        }
-
-        @Override
-        protected void paintThumb(Graphics g, JComponent c, Rectangle thumbBounds) {
-            Graphics2D g2 = (Graphics2D) g.create();
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g2.setColor(thumbColor);
-            g2.fillRoundRect(thumbBounds.x + 2, thumbBounds.y + 2,
-                    thumbBounds.width - 4, thumbBounds.height - 4, 8, 8);
-            g2.dispose();
-        }
-
-        @Override
-        protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-            g.setColor(trackColor);
-            g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
-        }
-    }
+    // ModernScrollBarUI removed because FlatLaf handles scrollbars beautifully
 }

@@ -66,7 +66,8 @@ public class MainFrame extends JFrame {
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setBackground(BG_DARK);
         splitPane.setDividerSize(3);
-        splitPane.setDividerLocation(400);
+        splitPane.setDividerLocation(850); // Set initial location to give Survey Creation more space
+        splitPane.setResizeWeight(0.8); // Ensure left side (Survey Creation) gets 80% of extra space
         splitPane.setContinuousLayout(true);
         splitPane.setBorder(null);
 

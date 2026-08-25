@@ -18,6 +18,11 @@ import java.util.Properties;
 public class Main {
 
     public static void main(String[] args) {
+        // --- שיפורי ביצועים (Performance Tweaks) ---
+        System.setProperty("sun.java2d.metal", "true"); // Hardware acceleration for macOS
+        System.setProperty("sun.java2d.opengl", "true"); // Fallback hardware acceleration
+        System.setProperty("FlatLaf.animation", "false"); // Disable animations for instant click response
+
         // טעינת הגדרות
         Properties config = loadConfig();
         String botToken = config.getProperty("bot.token", "");
@@ -40,10 +45,20 @@ public class Main {
         // הפעלת Swing GUI
         SwingUtilities.invokeLater(() -> {
             try {
-                // Dark look & feel
-                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+                // Mac Dark look & feel for premium SaaS look
+                UIManager.setLookAndFeel(new com.formdev.flatlaf.themes.FlatMacDarkLaf());
+                UIManager.put("Button.arc", 999);        // Pill-shaped buttons
+                UIManager.put("Component.arc", 12);
+                UIManager.put("ProgressBar.arc", 12);
+                UIManager.put("TextComponent.arc", 12);
+                
+                // Enhance button speed and feedback
+                UIManager.put("Button.hoverBackground", new java.awt.Color(255, 255, 255, 30));
+                UIManager.put("Component.focusWidth", 2);
+                UIManager.put("ScrollBar.thumbArc", 999);
             } catch (Exception e) {
                 // fallback to default
+                e.printStackTrace();
             }
 
             MainFrame frame = new MainFrame(communityManager, surveyManager, chatGPTService);

@@ -240,13 +240,17 @@ public class SurveyCreationPanel extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
 
         // נושא
-        JPanel topicPanel = createPanel(BG_CARD);
-        topicPanel.setLayout(new BorderLayout(PADDING, PADDING_SMALL));
+        JPanel topicPanel = new JPanel(new BorderLayout(PADDING, PADDING_SMALL)) {
+            @Override
+            public Dimension getMaximumSize() {
+                return new Dimension(Integer.MAX_VALUE, getPreferredSize().height);
+            }
+        };
+        topicPanel.setBackground(BG_CARD);
         topicPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createLineBorder(BORDER_COLOR),
                 createPaddedBorder(PADDING)
         ));
-        topicPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
 
         JLabel topicLabel = createLabel("🤖 נושא הסקר:", FONT_BODY_BOLD, TEXT_PRIMARY);
         topicField = createStyledTextField("");
@@ -330,7 +334,11 @@ public class SurveyCreationPanel extends JPanel {
                     showGeneratedPreview();
                     showStatus("✅ שאלות נוצרו בהצלחה!", ACCENT_GREEN);
                 } catch (Exception ex) {
-                    showStatus("❌ שגיאה: " + ex.getCause().getMessage(), ACCENT_RED);
+                    ex.printStackTrace();
+                    String msg = (ex.getCause() != null && ex.getCause().getMessage() != null) 
+                            ? ex.getCause().getMessage() 
+                            : ex.getMessage();
+                    showStatus("❌ שגיאה: " + msg, ACCENT_RED);
                 }
             }
         };
@@ -352,18 +360,31 @@ public class SurveyCreationPanel extends JPanel {
                     BorderFactory.createLineBorder(BORDER_COLOR),
                     createPaddedBorder(PADDING)
             ));
-            qPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
 
-            JLabel qText = createLabel("שאלה " + (q.getQuestionIndex() + 1) + ": " + q.getQuestionText(),
-                    FONT_BODY_BOLD, TEXT_PRIMARY);
-            qText.setAlignmentX(Component.RIGHT_ALIGNMENT);
-            qPanel.add(qText);
+            JTextArea qTextArea = new JTextArea("שאלה " + (q.getQuestionIndex() + 1) + ": " + q.getQuestionText());
+            qTextArea.setFont(FONT_BODY_BOLD);
+            qTextArea.setForeground(TEXT_PRIMARY);
+            qTextArea.setBackground(BG_CARD);
+            qTextArea.setLineWrap(true);
+            qTextArea.setWrapStyleWord(true);
+            qTextArea.setEditable(false);
+            qTextArea.setFocusable(false);
+            qTextArea.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+            
+            qPanel.add(qTextArea);
             qPanel.add(Box.createVerticalStrut(PADDING_SMALL));
 
             for (int i = 0; i < q.getOptions().size(); i++) {
-                JLabel optLabel = createLabel("   • " + q.getOptions().get(i), FONT_BODY, TEXT_SECONDARY);
-                optLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-                qPanel.add(optLabel);
+                JTextArea optArea = new JTextArea("   • " + q.getOptions().get(i));
+                optArea.setFont(FONT_BODY);
+                optArea.setForeground(TEXT_SECONDARY);
+                optArea.setBackground(BG_CARD);
+                optArea.setLineWrap(true);
+                optArea.setWrapStyleWord(true);
+                optArea.setEditable(false);
+                optArea.setFocusable(false);
+                optArea.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+                qPanel.add(optArea);
             }
 
             generatedPreviewPanel.add(qPanel);
@@ -537,15 +558,13 @@ public class SurveyCreationPanel extends JPanel {
 
     private void styleRadioButton(JRadioButton radio) {
         radio.setFont(FONT_BODY);
-        radio.setForeground(TEXT_PRIMARY);
-        radio.setBackground(BG_CARD);
+        // FlatLaf handles colors natively
         radio.setFocusPainted(false);
     }
 
     private void styleSpinner(JSpinner spinner) {
         spinner.setFont(FONT_BODY);
         spinner.setPreferredSize(new Dimension(60, 30));
-        spinner.getEditor().getComponent(0).setBackground(BG_INPUT);
-        spinner.getEditor().getComponent(0).setForeground(TEXT_PRIMARY);
+        // FlatLaf handles editor colors natively
     }
 }
